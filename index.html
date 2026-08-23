@@ -1,0 +1,3456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KN Credenciais &amp; Lenel — Kuehne+Nagel</title>
+<style>
+:root{
+  --navy:#003B5C;
+  --blue:#005B82;
+  --skyblue:#00A3E0;
+  --gold:#F5C400;
+  --ink:#0E2233;
+  --paper:#F6F8FA;
+  --card:#FFFFFF;
+  --line:#DCE3E8;
+  --muted:#5C7080;
+  --danger:#C0392B;
+  --good:#1E7A46;
+  --radius:10px;
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --sans:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+  --badge-ink:#020F1A;
+  --badge-muted:#5C7080;
+}
+
+/* ---------- Modo escuro ---------- */
+body.dark{
+  --paper:#0C1620;
+  --card:#17232E;
+  --ink:#E9EEF3;
+  --line:#2B3A48;
+  --muted:#93A5B3;
+}
+body.dark thead th{background:#101B25;}
+body.dark tbody tr:hover{background:#1B2733;}
+body.dark .picker-row:hover{background:#1B2733;}
+body.dark .search-box input,
+body.dark .picker-search input{background:var(--card);color:var(--ink);border-color:var(--line);}
+body.dark .field input, body.dark .field textarea, body.dark .field select{background:#101B25;color:var(--ink);border-color:var(--line);}
+body.dark .settings-field select{background:#101B25;color:var(--ink);}
+body.dark .btn-ghost{color:#BFE3F5;border-color:var(--line);}
+body.dark .btn-ghost:hover{border-color:var(--skyblue);}
+body.dark .import-preview th{background:#101B25;}
+body.dark .import-preview td{border-color:var(--line);}
+body.dark .chip{background:#173846;border-color:#215164;color:#BFE3F5;}
+body.dark .chip .x{background:var(--card);border-color:var(--line);color:var(--muted);}
+body.dark .picker-empty, body.dark .picker-hint{color:var(--muted);}
+body.dark .log-row{border-color:var(--line);}
+
+.theme-toggle{
+  background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.3);color:#fff;
+  border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;margin-left:10px;flex-shrink:0;
+}
+.theme-toggle:hover{background:rgba(255,255,255,0.22);}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--sans);
+  background:
+    radial-gradient(ellipse at top left, rgba(0,163,224,0.06), transparent 55%),
+    var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:linear-gradient(120deg,var(--navy) 0%,var(--blue) 100%);
+  color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 18px rgba(0,59,92,0.25);position:sticky;top:0;z-index:50;
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-mark{width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-mark svg{width:22px;height:22px;}
+.brand-text .title{font-weight:700;font-size:17px;letter-spacing:0.3px;}
+.brand-text .sub{font-size:11.5px;color:#BFE3F5;letter-spacing:1.6px;text-transform:uppercase;margin-top:1px;}
+.env-tag{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.3);padding:5px 12px;border-radius:100px;color:#EAF6FC;}
+.who-tag{font-size:12px;color:#EAF6FC;display:flex;align-items:center;gap:8px;}
+.who-tag button{background:none;border:none;color:#BFE3F5;text-decoration:underline;cursor:pointer;font-size:11.5px;font-family:var(--sans);padding:0;}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:4px;max-width:1180px;margin:24px auto 0;padding:0 24px;}
+.tab-btn{border:none;background:transparent;padding:12px 20px;font-size:14.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:color .15s, border-color .15s;font-family:var(--sans);}
+.tab-btn.active{color:var(--navy);border-bottom-color:var(--skyblue);}
+.tab-btn:hover{color:var(--blue);}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 24px 64px;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ---------- Cadastro ---------- */
+.toolrow{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px;}
+.tool-left{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.tool-right{display:flex;gap:10px;flex-wrap:wrap;}
+.search-box{position:relative;flex:1;min-width:220px;max-width:340px;}
+.search-box input{width:100%;padding:10px 14px 10px 36px;border-radius:8px;border:1px solid var(--line);font-size:14px;background:#fff;font-family:var(--sans);}
+.search-box::before{content:"⌕";position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;}
+.btn{border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:transform .08s, box-shadow .15s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-primary{background:var(--navy);color:#fff;}
+.btn-primary:hover{background:var(--blue);}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{filter:brightness(0.97);}
+.btn-ghost{background:transparent;color:var(--navy);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--skyblue);}
+.btn-sm{padding:6px 12px;font-size:12.5px;}
+.btn-danger-ghost{background:transparent;color:var(--danger);border:1px solid #F2D5D1;}
+.btn-danger-ghost:hover{background:#FDF1EF;}
+
+.table-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(14,34,51,0.04);}
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);background:#FAFBFC;padding:13px 18px;border-bottom:1px solid var(--line);font-weight:700;}
+tbody td{padding:3px 18px;border-bottom:1px solid #EEF2F5;font-size:13px;vertical-align:middle;line-height:1.3;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#FBFDFE;}
+.name-cell{font-weight:600;color:var(--ink);}
+.mono-cell{font-family:var(--mono);font-size:13px;color:var(--blue);}
+.pwd-cell{font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--muted);}
+.row-actions{display:flex;gap:6px;justify-content:flex-end;}
+.chk{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;}
+.empty-state{padding:60px 20px;text-align:center;color:var(--muted);}
+.blank-note{color:var(--muted);font-style:italic;}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(14,34,51,0.45);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(2px);padding:20px;}
+.overlay.show{display:flex;}
+.modal{background:#fff;border-radius:14px;width:420px;max-width:92vw;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;}
+.modal.modal-wide{width:640px;}
+.modal h3{margin:0 0 6px;font-size:17px;color:var(--navy);}
+.modal .modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.field input, .field textarea, .field select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:var(--sans);}
+.field textarea{font-family:var(--mono);font-size:12.5px;resize:vertical;min-height:140px;line-height:1.6;}
+.field input:focus, .field textarea:focus, .field select:focus{outline:none;border-color:var(--skyblue);box-shadow:0 0 0 3px rgba(0,163,224,0.14);}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+.import-preview{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:14px;max-height:220px;overflow-y:auto;}
+.import-preview table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.import-preview th{background:#FAFBFC;padding:8px 10px;text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;position:sticky;top:0;}
+.import-preview td{padding:7px 10px;border-top:1px solid #EEF2F5;}
+.import-preview .dup{color:var(--danger);font-style:italic;}
+.import-summary{font-size:12.5px;color:var(--muted);margin-top:10px;}
+.import-summary b{color:var(--navy);}
+
+/* ---------- Crachás tab ---------- */
+.cracha-controls{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px;}
+.select-hint{font-size:13px;color:var(--muted);}
+.select-hint b{color:var(--navy);}
+.type-selector{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.type-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .12s;}
+.type-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+.type-btn:hover:not(.active){border-color:var(--skyblue);color:var(--navy);}
+.picker-search{position:relative;margin-bottom:10px;}
+.picker-search input{width:100%;padding:11px 14px 11px 36px;border-radius:8px;border:1.5px solid var(--line);font-size:14.5px;background:#fff;font-family:var(--sans);}
+.picker-search input:focus{outline:none;border-color:var(--skyblue);}
+.picker-search::before{content:"⌕";position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;}
+.picker{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;max-height:260px;overflow-y:auto;}
+.picker-row{display:flex;align-items:center;gap:10px;padding:6px 12px;cursor:pointer;border-bottom:1px solid #F0F3F5;}
+.picker-row:last-child{border-bottom:none;}
+.picker-row:hover{background:#F5F9FB;}
+.picker-row .name{font-weight:600;font-size:12.5px;flex:1;line-height:1.3;}
+.picker-row .login{font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+.picker-empty{padding:16px;color:var(--muted);font-size:13px;text-align:center;}
+.picker-hint{padding:16px;color:var(--muted);font-size:13px;text-align:center;}
+.picker-hint .icon{font-size:20px;display:block;margin-bottom:6px;opacity:0.5;}
+.selected-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;min-height:0;}
+.chip{display:flex;align-items:center;gap:7px;background:#EAF3F8;border:1px solid #C9E2EE;border-radius:100px;padding:6px 8px 6px 12px;font-size:12.5px;color:var(--navy);font-weight:600;}
+.chip .x{width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid #C9E2EE;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--muted);line-height:1;flex-shrink:0;}
+.chip .x:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+.chip-empty{font-size:12.5px;color:var(--muted);font-style:italic;}
+
+.settings-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:22px;}
+.settings-panel .settings-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;}
+.settings-field label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+.settings-field select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:13.5px;font-family:var(--sans);background:#fff;}
+.toggle-row{display:flex;align-items:center;gap:9px;padding-top:6px;}
+.toggle-row label{font-size:13px;color:var(--ink);cursor:pointer;user-select:none;}
+.toggle-row input{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;}
+.print-actions{display:flex;gap:10px;margin-bottom:22px;}
+#cardsArea{display:flex;flex-wrap:wrap;gap:8mm;}
+
+.badge{width:90mm;height:57mm;background:#fff;border-radius:2.5mm;border:0.3mm solid var(--line);overflow:hidden;box-shadow:0 6px 20px rgba(0,59,92,0.10);position:relative;display:flex;flex-direction:column;}
+.badge.badge-large{width:105mm;height:65mm;}
+.badge-header{background:linear-gradient(120deg,var(--navy),var(--blue));padding:2mm 3mm;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.badge-header .kn{display:flex;align-items:center;gap:1.6mm;}
+.badge-header .kn-mark{width:4.5mm;height:4.5mm;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.badge-header .kn-mark svg{width:2.6mm;height:2.6mm;}
+.badge-header .kn-text{color:#fff;font-size:2.4mm;font-weight:700;letter-spacing:0.2mm;}
+.badge-header .code{font-family:var(--mono);font-size:1.9mm;color:#BFE3F5;letter-spacing:0.2mm;}
+.badge-id{background:var(--gold);color:var(--navy);text-align:center;padding:1.4mm 3mm;font-weight:700;font-size:2.7mm;letter-spacing:0.1mm;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.badge-id .role{display:block;font-size:1.6mm;text-transform:uppercase;letter-spacing:0.3mm;font-weight:700;color:rgba(0,59,92,0.62);margin-top:0.3mm;}
+.qr-zone{display:flex;flex:1;min-height:0;border-top:0.25mm dashed var(--line);position:relative;}
+.qr-zone.no-cut{border-top:none;}
+.qr-zone::after{content:"";position:absolute;left:50%;top:1.5mm;bottom:1.5mm;width:0;border-left:0.25mm dashed var(--line);}
+.qr-zone.single::after{display:none;}
+.qr-zone.single{justify-content:center;}
+.qr-zone.single .qr-col{flex:none;width:100%;}
+.qr-zone.single .qr-col canvas{width:28mm;height:28mm;}
+.badge.badge-large .qr-zone.single .qr-col canvas{width:34mm;height:34mm;}
+.qr-col{flex:1;padding:1.8mm 2mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;}
+.qr-col .cap{font-size:1.8mm;letter-spacing:0.3mm;text-transform:uppercase;color:var(--badge-muted);font-weight:800;margin-bottom:1.2mm;}
+.qr-col canvas{display:block;image-rendering:auto;width:20mm;height:20mm;}
+.badge.badge-large .qr-col canvas{width:24mm;height:24mm;}
+.qr-col .val{margin-top:1.4mm;font-family:var(--mono);font-size:2.5mm;font-weight:800;color:var(--badge-ink);word-break:break-all;line-height:1.3;letter-spacing:0.1mm;}
+.badge.badge-large .qr-col .val{font-size:2.9mm;}
+.qr-col .val.hidden-val{display:none;}
+.pwd-set{width:100%;padding:0 1mm;}
+.pwd-set input{width:100%;font-size:2.2mm;padding:1.4mm 1.6mm;border:0.25mm solid var(--line);border-radius:1.2mm;margin-bottom:1.4mm;text-align:center;font-family:var(--mono);}
+.pwd-set input:focus{outline:none;border-color:var(--skyblue);}
+.pwd-actions{display:flex;gap:1mm;justify-content:center;}
+.btn-mini{font-size:1.8mm;padding:1.1mm 1.8mm;border-radius:1.2mm;border:0.25mm solid var(--line);background:#fff;cursor:pointer;color:var(--navy);font-weight:700;font-family:var(--sans);}
+.btn-mini:hover{border-color:var(--skyblue);background:#F5FBFE;}
+.btn-mini.salvar{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-mini.salvar:hover{background:var(--blue);}
+.pwd-saved-tag{font-size:1.7mm;color:var(--good);font-weight:700;margin-top:1.2mm;}
+.badge-footer{padding:1mm 3mm 1.4mm;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.badge-footer .company{font-size:1.6mm;color:var(--badge-muted);letter-spacing:0.1mm;}
+.badge-footer .watermark{font-family:var(--mono);font-size:1.6mm;color:#C6D3DB;}
+
+.fold-pair{display:flex;align-items:stretch;position:relative;break-inside:avoid;}
+.fold-pair .badge{border-radius:0;}
+.fold-pair .badge:first-child{border-top-left-radius:2.5mm;border-bottom-left-radius:2.5mm;}
+.fold-pair .badge:last-child{border-top-right-radius:2.5mm;border-bottom-right-radius:2.5mm;}
+.fold-line{width:0;border-left:0.4mm dashed #98A6AF;position:relative;flex-shrink:0;}
+.fold-line .fold-tag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);background:#fff;color:var(--muted);font-size:1.8mm;font-weight:700;letter-spacing:0.3mm;padding:0.5mm 1.5mm;white-space:nowrap;}
+.lenel-noMatch{display:flex;align-items:center;justify-content:center;text-align:center;font-size:2.1mm;color:var(--muted);padding:3mm;line-height:1.5;}
+
+/* ---------- Histórico ---------- */
+.log-row{display:flex;gap:14px;padding:10px 16px;border-bottom:1px solid #EEF2F5;font-size:13px;align-items:flex-start;}
+.log-row:last-child{border-bottom:none;}
+.log-time{color:var(--muted);font-size:11.5px;font-family:var(--mono);white-space:nowrap;min-width:120px;padding-top:1px;}
+.log-ext{font-family:var(--mono);color:var(--blue);font-weight:700;min-width:110px;white-space:nowrap;}
+.log-acao{flex:1;}
+.log-acao b{color:var(--navy);}
+.log-detalhe{color:var(--muted);font-size:12px;margin-top:2px;}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ---------- Print ---------- */
+@media print{
+  .topbar,.tabs,.toolrow,.cracha-controls,.picker,.picker-search,.type-selector,.settings-panel,.print-actions,.toast{display:none !important;}
+  body{background:#fff;}
+  .wrap{padding:0;margin:0;max-width:none;}
+  #cardsArea{gap:14px;}
+  .badge{box-shadow:none;border:1px solid #999;break-inside:avoid;}
+  .panel{display:none !important;}
+  .panel.active{display:block !important;}
+  .pwd-actions{display:none !important;}
+  .pwd-set input{border:1px solid #aaa;background:#fff;}
+}
+@media (max-width:640px){
+  .topbar{padding:14px 16px;}
+  .wrap{padding:16px;}
+  .modal.modal-wide{width:92vw;}
+  #cardsArea{justify-content:center;}
+  .who-tag{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#003B5C" stroke-width="2"><path d="M12 2v20M5 9c0 4 3 6 7 6s7-2 7-6M2 9h20" stroke-linecap="round"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="title">KUEHNE+NAGEL</div>
+      <div class="sub">Credenciais &amp; Lenel</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="env-tag" id="countTag">0 cadastros</div>
+    <button class="theme-toggle" id="themeToggle" title="Alternar página clara/escura">🌙</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="cadastro">Banco de Dados</button>
+  <button class="tab-btn" data-tab="crachas">Gerar Crachás</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== CADASTRO ===================== -->
+  <div class="panel active" id="panel-cadastro">
+    <div class="toolrow">
+      <div class="tool-left">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Buscar por nome, login/ext ou Groot ID...">
+        </div>
+      </div>
+      <div class="tool-right">
+        <button class="btn btn-ghost" id="btnImportar">📋 Colar lista</button>
+        <button class="btn btn-ghost" id="btnExportarBackup">⬇ Exportar backup</button>
+        <button class="btn btn-danger-ghost" id="btnExcluirTudo">🗑 Excluir tudo</button>
+        <button class="btn btn-primary" id="btnNovo">+ Nova pessoa</button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Login / Ext</th>
+            <th>Senha</th>
+            <th>Groot ID</th>
+            <th style="text-align:right;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div>Ninguém cadastrado ainda. Use "Colar lista" para importar em massa.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CRACHÁS ===================== -->
+  <div class="panel" id="panel-crachas">
+    <div class="type-selector">
+      <button class="type-btn" data-tipo="credencial">🔑 Só credencial (Login/Senha)</button>
+      <button class="type-btn" data-tipo="lenel">🕓 Só Lenel (Groot ID)</button>
+      <button class="type-btn active" data-tipo="ambos">🪪 Ambos lado a lado (dobrar em 1)</button>
+    </div>
+
+    <div class="cracha-controls">
+      <div class="select-hint"><b id="selCount">0</b> selecionado(s) para gerar</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="btnSelNone">Limpar seleção</button>
+      </div>
+    </div>
+
+    <div class="picker-search">
+      <input type="text" id="pickerSearch" placeholder="Digite o nome, login/ext ou Groot ID para localizar...">
+    </div>
+    <div class="picker" id="pickerList"></div>
+
+    <div class="selected-chips" id="selectedChips"></div>
+
+    <div class="settings-panel">
+      <div class="settings-title">⚙ Configurações de impressão</div>
+      <div class="settings-grid">
+        <div class="settings-field">
+          <label>Colunas por linha</label>
+          <select id="cfgColunas">
+            <option value="1">1 por linha</option>
+            <option value="2" selected>2 por linha</option>
+            <option value="3">3 por linha</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Tamanho do cartão</label>
+          <select id="cfgTamanho">
+            <option value="padrao" selected>Cartão de crédito (90 x 57 mm)</option>
+            <option value="grande">Um pouco maior (105 x 65 mm)</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Orientação da página</label>
+          <select id="cfgOrientacao">
+            <option value="portrait" selected>Retrato</option>
+            <option value="landscape">Paisagem</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Papel</label>
+          <select id="cfgPapel">
+            <option value="A4" selected>A4</option>
+            <option value="Letter">Carta (Letter)</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-grid" style="margin-top:14px;">
+        <div class="toggle-row">
+          <input type="checkbox" id="cfgMostrarTexto" checked>
+          <label for="cfgMostrarTexto">Mostrar login/senha/Groot ID em texto sob o QR</label>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="cfgLinhaCorte" checked>
+          <label for="cfgLinhaCorte">Mostrar linha de corte tracejada</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="print-actions">
+      <button class="btn btn-gold" id="btnGerar">Gerar cartões</button>
+      <button class="btn btn-primary" id="btnImprimir">🖨 Imprimir / Baixar PDF</button>
+    </div>
+
+    <div id="cardsArea"></div>
+  </div>
+
+</div>
+
+<!-- Modal cadastro individual -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="modalTitle">Nova pessoa</h3>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="fNome" placeholder="Ex: Sara de Souza Peixoto">
+    </div>
+    <div class="field">
+      <label>Login / Ext</label>
+      <input type="text" id="fLogin" placeholder="Ex: ext_sarpeixo">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="text" id="fSenha" placeholder="Ex: Prsaa@6701 (pode deixar em branco)">
+    </div>
+    <div class="field">
+      <label>Groot ID</label>
+      <input type="text" id="fGrootId" placeholder="Ex: 118273 (pode deixar em branco)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvar">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal importação em massa -->
+<div class="overlay" id="overlayImport">
+  <div class="modal modal-wide">
+    <h3>Colar lista</h3>
+    <div class="modal-sub">
+      Cole diretamente do Excel/Planilha — aceita as colunas <b>Nome, Login, Senha</b> ou <b>Nome, Login, Senha, Groot ID</b> (separadas por TAB), ou digite uma pessoa por linha separando por vírgula: <br>
+      <code>Sara de Souza Peixoto, ext_sarpeixo, Prsaa@6701, 118273</code><br>
+      Senha e Groot ID podem ficar em branco. Se o login já existir no banco, os dados são atualizados; se não existir, uma pessoa nova é criada.
+    </div>
+    <div class="field">
+      <textarea id="fImportText" placeholder="Cole aqui a lista..."></textarea>
+    </div>
+    <div class="toggle-row" style="margin-bottom:4px;">
+      <input type="checkbox" id="cfgSincronizarImport">
+      <label for="cfgSincronizarImport">Sincronizar: remover do banco quem NÃO estiver nesta lista (use quando colar a lista completa e atualizada de quem está ativo)</label>
+    </div>
+    <div id="importPreviewWrap" style="display:none;">
+      <div class="import-preview">
+        <table>
+          <thead><tr><th>Nome</th><th>Login</th><th>Senha</th><th>Groot ID</th><th>Status</th></tr></thead>
+          <tbody id="importPreviewBody"></tbody>
+        </table>
+      </div>
+      <div class="import-summary" id="importSummary"></div>
+      <div id="removalWarnImport" style="display:none;margin-top:14px;padding:12px 14px;background:#FDF1EF;border:1px solid #F2D5D1;border-radius:8px;">
+        <div style="font-size:12.5px;font-weight:700;color:var(--danger);margin-bottom:8px;">⚠ Serão removidos do banco (não estão mais na lista colada):</div>
+        <div id="removalListImport" style="font-size:12.5px;color:var(--ink);max-height:140px;overflow-y:auto;line-height:1.7;"></div>
+        <div class="toggle-row" style="margin-top:10px;">
+          <input type="checkbox" id="cfgConfirmarRemocaoImport">
+          <label for="cfgConfirmarRemocaoImport" style="color:var(--danger);font-weight:600;">Confirmo a remoção das pessoas acima</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelarImport">Cancelar</button>
+      <button class="btn btn-ghost" id="btnPreviewImport">Pré-visualizar</button>
+      <button class="btn btn-primary" id="btnConfirmarImport" disabled>Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal excluir tudo -->
+<div class="overlay" id="overlayExcluirTudo">
+  <div class="modal">
+    <h3 style="color:var(--danger);">⚠ Excluir todo o banco</h3>
+    <div class="modal-sub">
+      Isso vai apagar <b id="excluirTudoCount">0</b> cadastro(s) — nome, login, senha e Groot ID de todo mundo. Essa ação não pode ser desfeita.
+      <br><br>
+      Pra confirmar, digite <b>EXCLUIR TUDO</b> no campo abaixo:
+    </div>
+    <div class="field">
+      <input type="text" id="fConfirmarExcluirTudo" placeholder="Digite EXCLUIR TUDO">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelarExcluirTudo">Cancelar</button>
+      <button class="btn btn-danger-ghost" id="btnConfirmarExcluirTudo" disabled style="background:var(--danger);color:#fff;border-color:var(--danger);">Excluir tudo</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<!-- QR Code engine (kazuhikoarase/qrcode-generator, MIT) -->
+<script>
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+
+<script>
+(function(){
+  // =========== CONFIGURAÇÃO DO SUPABASE — PREENCHA AQUI ===========
+  const SUPABASE_URL = 'COLE_AQUI_SUA_PROJECT_URL';
+  const SUPABASE_ANON_KEY = 'COLE_AQUI_SUA_ANON_KEY';
+  // ===================================================================
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const TABLE = 'kn_credenciais_lenel';
+
+  let db = [];
+  let selected = new Set();
+  let pendingImport = [];
+  let tipoCartao = 'ambos';
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2400);
+  }
+  function uid(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function rowFromDb(r){ return { id:r.id, nome:r.nome||'', login:r.login||'', senha:r.senha||'', grootId:r.groot_id||'' }; }
+
+  // =========================================================
+  // ===================== TEMA CLARO/ESCURO ===================
+  // =========================================================
+  const THEME_KEY = 'kn_theme_pref';
+  function applyTheme(dark){
+    document.body.classList.toggle('dark', dark);
+    document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙';
+  }
+  applyTheme(localStorage.getItem(THEME_KEY) === 'dark');
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    const isDark = !document.body.classList.contains('dark');
+    applyTheme(isDark);
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+  });
+
+  // =========================================================
+  // ===================== APP =====================
+  // =========================================================
+  let appInited = false;
+  async function initApp(){
+    if(appInited) return;
+    appInited = true;
+
+    // ---------- Tabs ----------
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+        if(btn.dataset.tab === 'crachas'){ renderPicker(); renderSelectedChips(); }
+      });
+    });
+
+    await fetchAll();
+    subscribeRealtime();
+    renderTable();
+
+    // ---------- Table render ----------
+    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.querySelectorAll('[data-edit],[data-del]').forEach(()=>{}); // noop, delegated below via renderTable
+
+    // ---------- Modal individual ----------
+    document.getElementById('btnNovo').addEventListener('click', ()=>openModal(null));
+    document.getElementById('btnCancelar').addEventListener('click', closeModal);
+    document.getElementById('overlay').addEventListener('click', e=>{ if(e.target===document.getElementById('overlay')) closeModal(); });
+    document.getElementById('btnSalvar').addEventListener('click', salvarPessoa);
+
+    // ---------- Import ----------
+    document.getElementById('btnImportar').addEventListener('click', abrirImport);
+    document.getElementById('btnCancelarImport').addEventListener('click', ()=>document.getElementById('overlayImport').classList.remove('show'));
+    document.getElementById('overlayImport').addEventListener('click', e=>{ if(e.target===document.getElementById('overlayImport')) document.getElementById('overlayImport').classList.remove('show'); });
+    document.getElementById('btnPreviewImport').addEventListener('click', previewImport);
+    document.getElementById('cfgSincronizarImport').addEventListener('change', ()=>{
+      document.getElementById('cfgConfirmarRemocaoImport').checked = false;
+      if(pendingImport.length) previewImport(); else updateImportButtonState();
+    });
+    document.getElementById('cfgConfirmarRemocaoImport').addEventListener('change', updateImportButtonState);
+    document.getElementById('btnConfirmarImport').addEventListener('click', confirmarImport);
+
+    // ---------- Excluir tudo ----------
+    document.getElementById('btnExcluirTudo').addEventListener('click', abrirExcluirTudo);
+    document.getElementById('btnCancelarExcluirTudo').addEventListener('click', ()=>document.getElementById('overlayExcluirTudo').classList.remove('show'));
+    document.getElementById('overlayExcluirTudo').addEventListener('click', e=>{ if(e.target===document.getElementById('overlayExcluirTudo')) document.getElementById('overlayExcluirTudo').classList.remove('show'); });
+    document.getElementById('fConfirmarExcluirTudo').addEventListener('input', (e)=>{
+      document.getElementById('btnConfirmarExcluirTudo').disabled = e.target.value.trim().toUpperCase() !== 'EXCLUIR TUDO';
+    });
+    document.getElementById('btnConfirmarExcluirTudo').addEventListener('click', confirmarExcluirTudo);
+
+    // ---------- Backup ----------
+    document.getElementById('btnExportarBackup').addEventListener('click', exportarBackup);
+
+    // ---------- Crachás ----------
+    document.querySelectorAll('.type-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        tipoCartao = btn.dataset.tipo;
+      });
+    });
+    document.getElementById('pickerSearch').addEventListener('input', renderPicker);
+    document.getElementById('btnSelNone').addEventListener('click', ()=>{
+      selected.clear(); renderPicker(); renderSelectedChips(); updateSelCount();
+    });
+    document.getElementById('btnGerar').addEventListener('click', gerarCartoes);
+    document.getElementById('btnImprimir').addEventListener('click', ()=>{
+      if(document.getElementById('cardsArea').children.length === 0){ toast('Gere os cartões antes de imprimir.'); return; }
+      applyPrintSetup();
+      window.print();
+    });
+  }
+
+  // =========================================================
+  // ===================== DADOS (Supabase) =====================
+  // =========================================================
+  async function fetchAll(){
+    const { data, error } = await sb.from(TABLE).select('*').order('nome', { ascending: true });
+    if(error){ toast('Erro ao carregar o banco: ' + error.message); return; }
+    db = (data || []).map(rowFromDb);
+    document.getElementById('countTag').textContent = db.length + (db.length===1?' cadastro':' cadastros');
+  }
+
+  function subscribeRealtime(){
+    sb.channel('kn_credenciais_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, async ()=>{
+        await fetchAll();
+        renderTable();
+        renderPicker();
+        renderSelectedChips();
+      })
+      .subscribe();
+  }
+
+  // =========================================================
+  // ===================== TABELA / CRUD =====================
+  // =========================================================
+  function renderTable(){
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const body = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+    body.innerHTML = '';
+    const filtered = db.filter(r => !q || r.nome.toLowerCase().includes(q) || r.login.toLowerCase().includes(q) || r.grootId.toLowerCase().includes(q));
+    empty.style.display = filtered.length === 0 ? 'block' : 'none';
+    filtered.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="name-cell">${escapeHtml(r.nome)}</td>
+        <td class="mono-cell">${escapeHtml(r.login)}</td>
+        <td class="pwd-cell">${r.senha ? escapeHtml(r.senha) : '<span class="blank-note">em branco</span>'}</td>
+        <td class="mono-cell">${r.grootId ? escapeHtml(r.grootId) : '<span class="blank-note">em branco</span>'}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm" data-edit="${r.id}">Editar</button>
+            <button class="btn btn-danger-ghost btn-sm" data-del="${r.id}">Excluir</button>
+          </div>
+        </td>`;
+      body.appendChild(tr);
+    });
+    document.getElementById('countTag').textContent = db.length + (db.length===1?' cadastro':' cadastros');
+    body.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', ()=>openModal(b.dataset.edit)));
+    body.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>removeRecord(b.dataset.del)));
+  }
+
+  async function removeRecord(id){
+    const r = db.find(x=>x.id===id);
+    if(!r) return;
+    if(!confirm('Excluir "' + r.nome + '" do banco?')) return;
+    const { error } = await sb.from(TABLE).delete().eq('id', id);
+    if(error){ toast('Erro ao excluir: ' + error.message); return; }
+    db = db.filter(x=>x.id!==id);
+    selected.delete(id);
+    renderTable();
+    toast('Excluído.');
+  }
+
+  const overlay = document.getElementById('overlay');
+  function openModal(id){
+    document.getElementById('editId').value = id || '';
+    if(id){
+      const r = db.find(x=>x.id===id);
+      document.getElementById('modalTitle').textContent = 'Editar pessoa';
+      document.getElementById('fNome').value = r.nome;
+      document.getElementById('fLogin').value = r.login;
+      document.getElementById('fSenha').value = r.senha;
+      document.getElementById('fGrootId').value = r.grootId;
+    } else {
+      document.getElementById('modalTitle').textContent = 'Nova pessoa';
+      document.getElementById('fNome').value = '';
+      document.getElementById('fLogin').value = '';
+      document.getElementById('fSenha').value = '';
+      document.getElementById('fGrootId').value = '';
+    }
+    overlay.classList.add('show');
+    document.getElementById('fNome').focus();
+  }
+  function closeModal(){ overlay.classList.remove('show'); }
+
+  async function salvarPessoa(){
+    const nome = document.getElementById('fNome').value.trim();
+    const login = document.getElementById('fLogin').value.trim();
+    const senha = document.getElementById('fSenha').value.trim();
+    const grootId = document.getElementById('fGrootId').value.trim();
+    if(!nome || !login){ toast('Preencha ao menos nome e login/ext.'); return; }
+    const id = document.getElementById('editId').value;
+
+    if(id){
+      const { error } = await sb.from(TABLE).update({ nome, login, senha, groot_id: grootId, updated_at: new Date().toISOString() }).eq('id', id);
+      if(error){ toast('Erro ao salvar: ' + error.message); return; }
+      const r = db.find(x=>x.id===id);
+      r.nome=nome; r.login=login; r.senha=senha; r.grootId=grootId;
+      toast('Cadastro atualizado.');
+    } else {
+      const { data, error } = await sb.from(TABLE).insert({ nome, login, senha, groot_id: grootId }).select().single();
+      if(error){ toast('Erro ao criar: ' + (error.message.includes('duplicate') ? 'esse login já existe.' : error.message)); return; }
+      db.push(rowFromDb(data));
+      toast('Pessoa cadastrada.');
+    }
+    renderTable();
+    closeModal();
+  }
+
+  // =========================================================
+  // ===================== IMPORTAÇÃO =====================
+  // =========================================================
+  function abrirImport(){
+    document.getElementById('fImportText').value = '';
+    document.getElementById('importPreviewWrap').style.display = 'none';
+    document.getElementById('removalWarnImport').style.display = 'none';
+    document.getElementById('cfgSincronizarImport').checked = false;
+    document.getElementById('cfgConfirmarRemocaoImport').checked = false;
+    document.getElementById('btnConfirmarImport').disabled = true;
+    pendingImport = [];
+    document.getElementById('overlayImport').classList.add('show');
+    document.getElementById('fImportText').focus();
+  }
+
+  function parseImportText(raw){
+    const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+    const existingLogins = new Set(db.map(r=>r.login.toLowerCase()));
+    const seenInBatch = new Map();
+    const rows = [];
+    const HEADER_NAMES = ['nome','nomes'];
+    const HEADER_LOGINS = ['login','logins','usuario','usuário'];
+    const MASKED_RE = /^[•\*]{4,}$/;
+
+    lines.forEach(line=>{
+      let parts;
+      if(line.includes('\t')) parts = line.split('\t');
+      else parts = line.split(',');
+      parts = parts.map(p=>p.trim()).filter((p,i,arr)=> !(p==='' && i===arr.length-1));
+
+      if(parts.length >= 2 && HEADER_NAMES.includes(parts[0].toLowerCase()) && HEADER_LOGINS.includes(parts[1].toLowerCase())){
+        rows.push({nome: parts[0], login: parts[1]||'', senha: parts[2]||'', grootId: parts[3]||'', status:'cabecalho', msg:'Cabeçalho ignorado'});
+        return;
+      }
+      if(parts.length < 2){
+        rows.push({nome: line, login:'', senha:'', grootId:'', status:'erro', msg:'Formato incompleto (faltam nome e login)'});
+        return;
+      }
+      const nome = parts[0];
+      const login = parts[1];
+      let senha = parts.length >= 3 ? parts[2] : '';
+      const grootId = parts.length >= 4 ? parts[3] : '';
+
+      if(!nome || !login){
+        rows.push({nome: nome||'', login: login||'', senha, grootId, status:'erro', msg:'Nome ou login em branco'});
+        return;
+      }
+      if(senha && MASKED_RE.test(senha)) senha = '';
+      if(login.toLowerCase() === 'erro ao criar' || senha.toLowerCase() === 'erro ao criar'){
+        rows.push({nome, login, senha, grootId, status:'erro', msg:'Conta marcada como erro na planilha (não foi criada)'});
+        return;
+      }
+      const loginKey = login.toLowerCase();
+      if(seenInBatch.has(loginKey)){
+        rows.push({nome, login, senha, grootId, status:'duplicado', msg:'Repetido na lista'});
+        return;
+      }
+      seenInBatch.set(loginKey, rows.length);
+      if(existingLogins.has(loginKey)){
+        rows.push({nome, login, senha, grootId, status:'atualizar', msg:'Já existe — dados serão atualizados'});
+      } else if(!senha){
+        rows.push({nome, login, senha:'', grootId, status:'semsenha', msg: grootId ? 'Sem senha (Groot ID importado)' : 'Sem senha — preencher depois'});
+      } else {
+        rows.push({nome, login, senha, grootId, status:'ok', msg:'Pronto para importar'});
+      }
+    });
+    return rows;
+  }
+
+  function presentLoginsFromPending(){
+    return new Set(pendingImport.filter(r=>r.status!=='cabecalho'&&r.status!=='erro').map(r=>r.login.toLowerCase()));
+  }
+
+  function updateImportButtonState(){
+    const sync = document.getElementById('cfgSincronizarImport').checked;
+    const confirmarRemocao = document.getElementById('cfgConfirmarRemocaoImport').checked;
+    const importCount = pendingImport.filter(r=>r.status==='ok'||r.status==='atualizar'||r.status==='semsenha').length;
+    const presentLogins = presentLoginsFromPending();
+    const removed = db.filter(e=>!presentLogins.has(e.login.toLowerCase()));
+    let canProceed;
+    if(sync && removed.length > 0) canProceed = confirmarRemocao;
+    else canProceed = importCount > 0;
+    document.getElementById('btnConfirmarImport').disabled = !canProceed;
+    return removed;
+  }
+
+  function previewImport(){
+    const raw = document.getElementById('fImportText').value;
+    if(!raw.trim()){ toast('Cole a lista antes de pré-visualizar.'); return; }
+    pendingImport = parseImportText(raw);
+    const body = document.getElementById('importPreviewBody');
+    body.innerHTML = '';
+    pendingImport.forEach(r=>{
+      if(r.status === 'cabecalho') return;
+      const tr = document.createElement('tr');
+      let statusLabel;
+      if(r.status==='ok') statusLabel = '✅ '+r.msg;
+      else if(r.status==='atualizar') statusLabel = '🔵 '+r.msg;
+      else if(r.status==='semsenha') statusLabel = '🟡 '+r.msg;
+      else if(r.status==='duplicado') statusLabel = '⚠️ '+r.msg;
+      else statusLabel = '❌ '+r.msg;
+      tr.innerHTML = `<td>${escapeHtml(r.nome)}</td><td>${escapeHtml(r.login)}</td><td>${r.senha?escapeHtml(r.senha):'<i style="color:var(--muted);">em branco</i>'}</td><td>${r.grootId?escapeHtml(r.grootId):'<i style="color:var(--muted);">em branco</i>'}</td><td class="${r.status==='erro'||r.status==='duplicado'?'dup':''}">${statusLabel}</td>`;
+      body.appendChild(tr);
+    });
+    const okCount = pendingImport.filter(r=>r.status==='ok').length;
+    const atCount = pendingImport.filter(r=>r.status==='atualizar').length;
+    const semSenhaCount = pendingImport.filter(r=>r.status==='semsenha').length;
+    const dupCount = pendingImport.filter(r=>r.status==='duplicado').length;
+    const errCount = pendingImport.filter(r=>r.status==='erro').length;
+    const hdrCount = pendingImport.filter(r=>r.status==='cabecalho').length;
+    document.getElementById('importSummary').innerHTML = `<b>${okCount}</b> nova(s) · <b>${atCount}</b> atualizada(s) · <b>${semSenhaCount}</b> sem senha · <b>${dupCount}</b> duplicada(s) · <b>${errCount}</b> com erro` + (hdrCount ? ` · ${hdrCount} cabeçalho(s) ignorado(s)` : '');
+    document.getElementById('importPreviewWrap').style.display = 'block';
+
+    const sync = document.getElementById('cfgSincronizarImport').checked;
+    const removalWarn = document.getElementById('removalWarnImport');
+    if(sync){
+      const presentLogins = presentLoginsFromPending();
+      const removed = db.filter(e=>!presentLogins.has(e.login.toLowerCase()));
+      if(removed.length > 0){
+        document.getElementById('removalListImport').innerHTML = removed.map(r=>`${escapeHtml(r.nome)} <span style="color:var(--muted);font-family:var(--mono);font-size:11px;">(${escapeHtml(r.login)})</span>`).join('<br>');
+        removalWarn.style.display = 'block';
+      } else removalWarn.style.display = 'none';
+    } else removalWarn.style.display = 'none';
+    updateImportButtonState();
+  }
+
+  async function confirmarImport(){
+    const sync = document.getElementById('cfgSincronizarImport').checked;
+    const confirmarRemocao = document.getElementById('cfgConfirmarRemocaoImport').checked;
+    const rows = pendingImport.filter(r=>r.status==='ok' || r.status==='atualizar' || r.status==='semsenha');
+    const btn = document.getElementById('btnConfirmarImport');
+    btn.disabled = true; btn.textContent = 'Importando...';
+
+    const toInsert = [];
+    const toUpdate = [];
+    rows.forEach(r=>{
+      const existing = db.find(x=>x.login.toLowerCase()===r.login.toLowerCase());
+      if(existing) toUpdate.push({ id: existing.id, nome: r.nome, senha: r.senha || existing.senha, groot_id: r.grootId || existing.grootId });
+      else toInsert.push({ nome: r.nome, login: r.login, senha: r.senha, groot_id: r.grootId });
+    });
+
+    let novos = 0, atualizados = 0, removidos = 0;
+    try{
+      if(toInsert.length){
+        const { data, error } = await sb.from(TABLE).insert(toInsert).select();
+        if(error) throw error;
+        novos = data.length;
+      }
+      if(toUpdate.length){
+        await Promise.all(toUpdate.map(u => sb.from(TABLE).update({ nome:u.nome, senha:u.senha, groot_id:u.groot_id, updated_at: new Date().toISOString() }).eq('id', u.id)));
+        atualizados = toUpdate.length;
+      }
+      if(sync && confirmarRemocao){
+        const presentLogins = presentLoginsFromPending();
+        const toRemove = db.filter(e=>!presentLogins.has(e.login.toLowerCase()));
+        if(toRemove.length){
+          const { error } = await sb.from(TABLE).delete().in('id', toRemove.map(r=>r.id));
+          if(error) throw error;
+          removidos = toRemove.length;
+        }
+      }
+      await fetchAll();
+      renderTable();
+      document.getElementById('overlayImport').classList.remove('show');
+      toast(novos + ' nova(s)' + (atualizados ? ' · ' + atualizados + ' atualizada(s)' : '') + (removidos ? ' · ' + removidos + ' removida(s)' : '') + '.');
+    }catch(e){
+      toast('Erro na importação: ' + e.message);
+    }
+    btn.textContent = 'Importar';
+    btn.disabled = false;
+  }
+
+  // =========================================================
+  // ===================== EXCLUIR TUDO =====================
+  // =========================================================
+  function abrirExcluirTudo(){
+    if(db.length === 0){ toast('O banco já está vazio.'); return; }
+    document.getElementById('excluirTudoCount').textContent = db.length;
+    document.getElementById('fConfirmarExcluirTudo').value = '';
+    document.getElementById('btnConfirmarExcluirTudo').disabled = true;
+    document.getElementById('overlayExcluirTudo').classList.add('show');
+    document.getElementById('fConfirmarExcluirTudo').focus();
+  }
+  async function confirmarExcluirTudo(){
+    const n = db.length;
+    const { error } = await sb.from(TABLE).delete().not('id', 'is', null);
+    if(error){ toast('Erro ao excluir: ' + error.message); return; }
+    db = [];
+    selected.clear();
+    renderTable(); renderPicker(); renderSelectedChips(); updateSelCount();
+    document.getElementById('overlayExcluirTudo').classList.remove('show');
+    toast(n + ' cadastro(s) excluído(s). Banco zerado.');
+  }
+
+  // =========================================================
+  // ===================== BACKUP (arquivo local) =====================
+  // =========================================================
+  function exportarBackup(){
+    if(db.length === 0){ toast('O banco está vazio, nada para exportar.'); return; }
+    const dataStr = JSON.stringify(db, null, 2);
+    const blob = new Blob([dataStr], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dataFmt = new Date().toISOString().slice(0,10);
+    a.href = url; a.download = `kn-backup-credenciais-${dataFmt}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Backup exportado (' + db.length + ' cadastro(s)).');
+  }
+
+  // =========================================================
+  // ===================== PICKER / SELEÇÃO =====================
+  // =========================================================
+  function renderPicker(){
+    const list = document.getElementById('pickerList');
+    const q = (document.getElementById('pickerSearch').value || '').trim().toLowerCase();
+    list.innerHTML = '';
+    if(db.length === 0){ list.innerHTML = '<div class="picker-empty">Cadastre ou importe pessoas na aba "Banco de Dados" primeiro.</div>'; return; }
+    if(!q){ list.innerHTML = '<div class="picker-hint"><span class="icon">⌕</span>Digite um nome, login/ext ou Groot ID para localizar a pessoa.</div>'; return; }
+    const filtered = db.filter(r => r.nome.toLowerCase().includes(q) || r.login.toLowerCase().includes(q) || r.grootId.toLowerCase().includes(q));
+    if(filtered.length === 0){ list.innerHTML = '<div class="picker-empty">Nenhum resultado para "'+escapeHtml(q)+'".</div>'; return; }
+    filtered.slice(0, 40).forEach(r=>{
+      const row = document.createElement('div');
+      row.className = 'picker-row';
+      row.innerHTML = `
+        <input type="checkbox" class="chk" data-pid="${r.id}" ${selected.has(r.id)?'checked':''}>
+        <span class="name">${escapeHtml(r.nome)}</span>
+        <span class="login">${escapeHtml(r.login)}${r.grootId ? ' · '+escapeHtml(r.grootId) : ''}</span>`;
+      row.addEventListener('click', (e)=>{
+        if(e.target.tagName.toLowerCase() !== 'input'){
+          const cb = row.querySelector('input');
+          cb.checked = !cb.checked;
+          cb.dispatchEvent(new Event('change'));
+        }
+      });
+      row.querySelector('input').addEventListener('change', (e)=>{
+        if(e.target.checked) selected.add(r.id); else selected.delete(r.id);
+        updateSelCount();
+        renderSelectedChips();
+      });
+      list.appendChild(row);
+    });
+  }
+  function updateSelCount(){ document.getElementById('selCount').textContent = selected.size; }
+
+  function renderSelectedChips(){
+    const wrap = document.getElementById('selectedChips');
+    wrap.innerHTML = '';
+    if(selected.size === 0){ wrap.innerHTML = '<div class="chip-empty">Ninguém selecionado ainda — use a busca acima.</div>'; return; }
+    Array.from(selected).forEach(id=>{
+      const r = db.find(x=>x.id===id);
+      if(!r) return;
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.innerHTML = `<span>${escapeHtml(r.nome)}</span><span class="x">✕</span>`;
+      chip.querySelector('.x').addEventListener('click', ()=>{
+        selected.delete(id);
+        renderSelectedChips(); renderPicker(); updateSelCount();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  // =========================================================
+  // ===================== GERAÇÃO DE CARTÕES =====================
+  // =========================================================
+  function makeQR(text, size){
+    const qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    const count = qr.getModuleCount();
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const cell = size / count;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#0E2233';
+    for(let row=0; row<count; row++){
+      for(let col=0; col<count; col++){
+        if(qr.isDark(row,col)) ctx.fillRect(Math.round(col*cell), Math.round(row*cell), Math.ceil(cell), Math.ceil(cell));
+      }
+    }
+    return canvas;
+  }
+  function kMark(){
+    return `<div class="kn-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#003B5C" stroke-width="2.4"><path d="M12 2v20M5 9c0 4 3 6 7 6s7-2 7-6M2 9h20" stroke-linecap="round"/></svg></div>`;
+  }
+  function randomPassword(){
+    const upper='ABCDEFGHJKLMNPQRSTUVWXYZ', lower='abcdefghijkmnpqrstuvwxyz', digits='23456789', symbols='@#%&*';
+    const pick=set=>set[Math.floor(Math.random()*set.length)];
+    return pick(upper)+pick(lower)+pick(lower)+pick(lower)+pick(digits)+pick(digits)+pick(digits)+pick(digits)+pick(symbols);
+  }
+  function randomGrootId(){ return String(Math.floor(100000 + Math.random()*900000)); }
+
+  function buildInlineFieldUI(col, record, field, qrSize, mostrarTexto, grande, placeholder){
+    col.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'pwd-set';
+    wrap.style.minHeight = (grande ? '24mm' : '20mm');
+    wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.justifyContent = 'center';
+    wrap.innerHTML = `
+      <input type="text" class="pwd-input" placeholder="${placeholder}">
+      <div class="pwd-actions">
+        <button type="button" class="btn-mini gerar">🎲 Gerar</button>
+        <button type="button" class="btn-mini salvar">Salvar</button>
+      </div>`;
+    col.appendChild(wrap);
+    const input = wrap.querySelector('.pwd-input');
+    wrap.querySelector('.gerar').addEventListener('click', ()=>{ input.value = field==='senha' ? randomPassword() : randomGrootId(); input.focus(); });
+    wrap.querySelector('.salvar').addEventListener('click', async ()=>{
+      const val = input.value.trim();
+      if(!val){ toast('Digite um valor ou clique em Gerar.'); return; }
+      const patch = field === 'senha' ? { senha: val } : { groot_id: val };
+      const { error } = await sb.from(TABLE).update({ ...patch, updated_at: new Date().toISOString() }).eq('id', record.id);
+      if(error){ toast('Erro ao salvar: ' + error.message); return; }
+      record[field] = val;
+      renderTable();
+      const qrCanvas = makeQR(val, qrSize);
+      const valDiv = document.createElement('div');
+      valDiv.className = 'val' + (mostrarTexto?'':' hidden-val');
+      valDiv.textContent = val;
+      col.innerHTML = '';
+      col.appendChild(qrCanvas);
+      col.appendChild(valDiv);
+      const tag = document.createElement('div');
+      tag.className = 'pwd-saved-tag';
+      tag.textContent = '✓ salva no banco';
+      col.appendChild(tag);
+      toast((field==='senha'?'Senha':'Groot ID') + ' definido(a) e salvo(a) no banco para ' + record.nome + '.');
+    });
+  }
+
+  function buildCredentialBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande){
+    const badge = document.createElement('div');
+    badge.className = 'badge' + (grande ? ' badge-large' : '');
+    const code = 'KN-' + (idx+1).toString().padStart(3,'0') + '-' + r.id.slice(-4).toUpperCase();
+    badge.innerHTML = `
+      <div class="badge-header"><div class="kn">${kMark()}<span class="kn-text">KUEHNE+NAGEL</span></div><span class="code">${code}</span></div>
+      <div class="badge-id">${escapeHtml(r.nome)}<span class="role">Acesso de sistema</span></div>
+      <div class="qr-zone ${linhaCorte ? '' : 'no-cut'}">
+        <div class="qr-col qr-login"><div class="cap">Login</div></div>
+        <div class="qr-col qr-senha"><div class="cap">Senha</div></div>
+      </div>
+      <div class="badge-footer"><span class="company">Uso individual e confidencial</span><span class="watermark">K+N</span></div>`;
+    const qrLoginCanvas = makeQR(r.login, qrSize);
+    const loginVal = document.createElement('div'); loginVal.className='val' + (mostrarTexto?'':' hidden-val'); loginVal.textContent = r.login;
+    const loginCol = badge.querySelector('.qr-login');
+    loginCol.appendChild(qrLoginCanvas); loginCol.appendChild(loginVal);
+    const senhaCol = badge.querySelector('.qr-senha');
+    if(r.senha){
+      const qrSenhaCanvas = makeQR(r.senha, qrSize);
+      const senhaVal = document.createElement('div'); senhaVal.className='val' + (mostrarTexto?'':' hidden-val'); senhaVal.textContent = r.senha;
+      senhaCol.appendChild(qrSenhaCanvas); senhaCol.appendChild(senhaVal);
+    } else {
+      buildInlineFieldUI(senhaCol, r, 'senha', qrSize, mostrarTexto, grande, 'Definir senha agora');
+    }
+    return badge;
+  }
+
+  function buildLenelBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande){
+    const badge = document.createElement('div');
+    badge.className = 'badge' + (grande ? ' badge-large' : '');
+    const code = 'KN-' + (idx+1).toString().padStart(3,'0') + '-' + r.id.slice(-4).toUpperCase();
+    badge.innerHTML = `
+      <div class="badge-header"><div class="kn">${kMark()}<span class="kn-text">KUEHNE+NAGEL</span></div><span class="code">${code}</span></div>
+      <div class="badge-id">${escapeHtml(r.nome)}<span class="role">Controle de ponto</span></div>
+      <div class="qr-zone single ${linhaCorte ? '' : 'no-cut'}"><div class="qr-col qr-groot"><div class="cap">Groot ID</div></div></div>
+      <div class="badge-footer"><span class="company">Uso individual e confidencial</span><span class="watermark">K+N</span></div>`;
+    const col = badge.querySelector('.qr-groot');
+    if(r.grootId){
+      const qrCanvas = makeQR(r.grootId, qrSize);
+      const val = document.createElement('div'); val.className='val' + (mostrarTexto?'':' hidden-val'); val.textContent = r.grootId;
+      col.appendChild(qrCanvas); col.appendChild(val);
+    } else {
+      buildInlineFieldUI(col, r, 'grootId', qrSize, mostrarTexto, grande, 'Definir Groot ID agora');
+    }
+    return badge;
+  }
+
+  function applyPrintSetup(){
+    const orientacao = document.getElementById('cfgOrientacao').value;
+    const papel = document.getElementById('cfgPapel').value;
+    let styleTag = document.getElementById('dynamicPrintStyle');
+    if(!styleTag){ styleTag = document.createElement('style'); styleTag.id = 'dynamicPrintStyle'; document.head.appendChild(styleTag); }
+    styleTag.textContent = `@page{ size:${papel} ${orientacao}; margin:12mm; }`;
+  }
+
+  function gerarCartoes(){
+    const area = document.getElementById('cardsArea');
+    area.innerHTML = '';
+    const chosen = db.filter(r=>selected.has(r.id));
+    if(chosen.length === 0){ toast('Selecione ao menos uma pessoa.'); return; }
+    const colunas = parseInt(document.getElementById('cfgColunas').value, 10);
+    const grande = document.getElementById('cfgTamanho').value === 'grande';
+    const mostrarTexto = document.getElementById('cfgMostrarTexto').checked;
+    const linhaCorte = document.getElementById('cfgLinhaCorte').checked;
+    const qrSize = 300;
+    area.className = '';
+    const badgeWidthMM = grande ? 105 : 90;
+    const pairWidthMM = tipoCartao === 'ambos' ? (badgeWidthMM * 2) : badgeWidthMM;
+    const gapMM = 8;
+    area.style.maxWidth = (colunas * pairWidthMM + (colunas - 1) * gapMM) + 'mm';
+    applyPrintSetup();
+    chosen.forEach((r, idx)=>{
+      if(tipoCartao === 'credencial') area.appendChild(buildCredentialBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande));
+      else if(tipoCartao === 'lenel') area.appendChild(buildLenelBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande));
+      else {
+        const pair = document.createElement('div');
+        pair.className = 'fold-pair';
+        pair.appendChild(buildCredentialBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande));
+        const foldLine = document.createElement('div');
+        foldLine.className = 'fold-line';
+        foldLine.innerHTML = '<span class="fold-tag">DOBRAR AQUI</span>';
+        pair.appendChild(foldLine);
+        pair.appendChild(buildLenelBadge(r, idx, qrSize, mostrarTexto, linhaCorte, grande));
+        area.appendChild(pair);
+      }
+    });
+    toast(chosen.length + ' cartão(ões) gerado(s).');
+  }
+
+  // ---------- init ----------
+  initApp();
+})();
+</script>
+
+</body>
+</html>
