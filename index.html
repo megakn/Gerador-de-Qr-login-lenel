@@ -3000,10 +3000,10 @@ var qrcode = function() {
   async function loadFromCloud(){
     try{
       const resp = await fetch(REST_URL + '?select=*&order=nome.asc', { headers: REST_HEADERS });
-      if(!resp.ok){ console.error('Erro ao carregar do Supabase:', resp.status, await resp.text()); toast('Erro ao carregar banco (' + resp.status + '). Veja o console.'); return null; }
+      if(!resp.ok){ const errTxt = await resp.text(); console.error('Erro ao carregar do Supabase:', resp.status, errTxt); showError('Erro ao carregar banco (' + resp.status + '): ' + errTxt); return null; }
       const data = await resp.json();
       return (data || []).map(rowToRecord);
-    }catch(e){ console.error('Erro de rede ao carregar do Supabase:', e); toast('Erro de conexão ao carregar banco. Veja o console.'); return null; }
+    }catch(e){ console.error('Erro de rede ao carregar do Supabase:', e); showError('Erro de conexão ao carregar banco: ' + (e && e.message ? e.message : e)); return null; }
   }
 
   // Grava o estado atual de "db" inteiro no Supabase (upsert de tudo + remove quem não está mais na lista)
@@ -3018,7 +3018,7 @@ var qrcode = function() {
           headers: Object.assign({}, REST_HEADERS, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
           body: JSON.stringify(rows)
         });
-        if(!resp.ok){ console.error('Erro ao salvar no Supabase:', resp.status, await resp.text()); toast('Erro ao salvar (' + resp.status + '). Veja o console.'); }
+        if(!resp.ok){ const errTxt = await resp.text(); console.error('Erro ao salvar no Supabase:', resp.status, errTxt); showError('Erro ao salvar (' + resp.status + '): ' + errTxt); }
       }
       const currentIds = db.map(r=>r.id);
       const respExisting = await fetch(REST_URL + '?select=id', { headers: REST_HEADERS });
@@ -3028,7 +3028,7 @@ var qrcode = function() {
         if(toDelete.length){
           const idsParam = toDelete.map(id => encodeURIComponent(id)).join(',');
           const delResp = await fetch(REST_URL + '?id=in.(' + idsParam + ')', { method: 'DELETE', headers: REST_HEADERS });
-          if(!delResp.ok) console.error('Erro ao remover registros:', delResp.status, await delResp.text());
+          if(!delResp.ok){ const errTxt = await delResp.text(); console.error('Erro ao remover registros:', delResp.status, errTxt); showError('Erro ao remover registros (' + delResp.status + '): ' + errTxt); }
         }
       }
     } finally {
@@ -3044,6 +3044,27 @@ var qrcode = function() {
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(()=>t.classList.remove('show'), 2400);
+  }
+
+  // Banner de erro fixo na tela (fica visível até ser fechado, sem precisar abrir o console)
+  function showError(msg){
+    let banner = document.getElementById('cloudErrorBanner');
+    if(!banner){
+      banner = document.createElement('div');
+      banner.id = 'cloudErrorBanner';
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#DC2626;color:#fff;padding:12px 16px;font:600 13px/1.4 Inter,system-ui,sans-serif;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.2);';
+      const span = document.createElement('span');
+      span.id = 'cloudErrorBannerText';
+      span.style.cssText = 'word-break:break-word;';
+      const btn = document.createElement('button');
+      btn.textContent = 'Fechar';
+      btn.style.cssText = 'flex-shrink:0;background:#fff;color:#DC2626;border:none;border-radius:6px;padding:4px 10px;font-weight:700;cursor:pointer;';
+      btn.onclick = ()=> banner.remove();
+      banner.appendChild(span);
+      banner.appendChild(btn);
+      document.body.appendChild(banner);
+    }
+    document.getElementById('cloudErrorBannerText').textContent = msg;
   }
 
   // ---------- Tema claro/escuro ----------
