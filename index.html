@@ -2970,24 +2970,56 @@ var qrcode = function() {
 
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
-  const STORAGE_KEY = 'kn_credenciais_db_v1';
-  let db = load();
+  // ---------- Conexão Supabase (banco compartilhado — todo mundo vê os mesmos dados) ----------
+  const SUPABASE_URL = 'https://cnpcsovjomonctbggbac.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_1lqP4jYYMR96Aq8DX-DSHA_JKcGESRt';
+  const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const TABLE = 'credenciais_crachas';
+
+  let db = [];
   let selected = new Set();
   let pendingImport = [];
   let tipoCartao = 'ambos';
+  let saving = false; // evita corrida entre saves simultâneos
 
-  function load(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const arr = raw ? JSON.parse(raw) : [];
-      return arr.map(r => ({ id:r.id, nome:r.nome||'', login:r.login||'', senha:r.senha||'', grootId:r.grootId||'' }));
-    }catch(e){ return []; }
+  function rowToRecord(row){
+    return { id: row.id, nome: row.nome || '', login: row.login || '', senha: row.senha || '', grootId: row.groot_id || '' };
   }
-  function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  function recordToRow(r){
+    return { id: r.id, nome: r.nome, login: r.login, senha: r.senha || '', groot_id: r.grootId || '' };
+  }
+
+  async function loadFromCloud(){
+    const { data, error } = await supa.from(TABLE).select('*').order('nome', { ascending: true });
+    if(error){ console.error('Erro ao carregar do Supabase:', error); toast('Erro ao carregar banco. Veja o console.'); return null; }
+    return (data || []).map(rowToRecord);
+  }
+
+  // Grava o estado atual de "db" inteiro no Supabase (upsert de tudo + remove quem não está mais na lista)
+  async function save(){
     document.getElementById('countTag').textContent = db.length + (db.length===1?' cadastro':' cadastros');
+    saving = true;
+    try{
+      const rows = db.map(recordToRow);
+      if(rows.length){
+        const { error: upErr } = await supa.from(TABLE).upsert(rows, { onConflict: 'id' });
+        if(upErr){ console.error('Erro ao salvar no Supabase:', upErr); toast('Erro ao salvar. Veja o console.'); }
+      }
+      const currentIds = db.map(r=>r.id);
+      const { data: existing, error: exErr } = await supa.from(TABLE).select('id');
+      if(!exErr && existing){
+        const toDelete = existing.map(r=>r.id).filter(id => !currentIds.includes(id));
+        if(toDelete.length){
+          const { error: delErr } = await supa.from(TABLE).delete().in('id', toDelete);
+          if(delErr) console.error('Erro ao remover registros:', delErr);
+        }
+      }
+    } finally {
+      saving = false;
+    }
   }
   function uid(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function escapeHtml(s){
@@ -3606,8 +3638,31 @@ var qrcode = function() {
   });
 
   // ---------- init ----------
-  renderTable();
-  document.getElementById('countTag').textContent = db.length + (db.length===1?' cadastro':' cadastros');
+  async function initFromCloud(){
+    const dados = await loadFromCloud();
+    if(dados) db = dados;
+    renderTable();
+    renderPicker();
+    renderSelectedChips();
+    updateSelCount();
+    document.getElementById('countTag').textContent = db.length + (db.length===1?' cadastro':' cadastros');
+  }
+  initFromCloud();
+
+  // Mantém sincronizado com o que outras pessoas cadastram: reconsulta periodicamente
+  // e sempre que a aba volta a ficar visível (troca de janela/aba).
+  async function refreshFromCloud(){
+    if(saving) return; // não pisa em cima de um salvamento em andamento
+    const dados = await loadFromCloud();
+    if(!dados) return;
+    db = dados;
+    renderTable();
+    renderPicker();
+    renderSelectedChips();
+    updateSelCount();
+  }
+  setInterval(refreshFromCloud, 15000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshFromCloud(); });
 })();
 </script>
 
