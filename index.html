@@ -2970,14 +2970,19 @@ var qrcode = function() {
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   // ---------- Conexão Supabase (banco compartilhado — todo mundo vê os mesmos dados) ----------
+  // Chamadas diretas à API REST do Supabase (PostgREST), sem depender de biblioteca externa.
   const SUPABASE_URL = 'https://cnpcsovjomonctbggbac.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_1lqP4jYYMR96Aq8DX-DSHA_JKcGESRt';
-  const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const TABLE = 'credenciais_crachas';
+  const REST_URL = SUPABASE_URL + '/rest/v1/' + TABLE;
+  const REST_HEADERS = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
 
   let db = [];
   let selected = new Set();
@@ -2993,9 +2998,12 @@ var qrcode = function() {
   }
 
   async function loadFromCloud(){
-    const { data, error } = await supa.from(TABLE).select('*').order('nome', { ascending: true });
-    if(error){ console.error('Erro ao carregar do Supabase:', error); toast('Erro ao carregar banco. Veja o console.'); return null; }
-    return (data || []).map(rowToRecord);
+    try{
+      const resp = await fetch(REST_URL + '?select=*&order=nome.asc', { headers: REST_HEADERS });
+      if(!resp.ok){ console.error('Erro ao carregar do Supabase:', resp.status, await resp.text()); toast('Erro ao carregar banco (' + resp.status + '). Veja o console.'); return null; }
+      const data = await resp.json();
+      return (data || []).map(rowToRecord);
+    }catch(e){ console.error('Erro de rede ao carregar do Supabase:', e); toast('Erro de conexão ao carregar banco. Veja o console.'); return null; }
   }
 
   // Grava o estado atual de "db" inteiro no Supabase (upsert de tudo + remove quem não está mais na lista)
@@ -3005,16 +3013,22 @@ var qrcode = function() {
     try{
       const rows = db.map(recordToRow);
       if(rows.length){
-        const { error: upErr } = await supa.from(TABLE).upsert(rows, { onConflict: 'id' });
-        if(upErr){ console.error('Erro ao salvar no Supabase:', upErr); toast('Erro ao salvar. Veja o console.'); }
+        const resp = await fetch(REST_URL + '?on_conflict=id', {
+          method: 'POST',
+          headers: Object.assign({}, REST_HEADERS, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+          body: JSON.stringify(rows)
+        });
+        if(!resp.ok){ console.error('Erro ao salvar no Supabase:', resp.status, await resp.text()); toast('Erro ao salvar (' + resp.status + '). Veja o console.'); }
       }
       const currentIds = db.map(r=>r.id);
-      const { data: existing, error: exErr } = await supa.from(TABLE).select('id');
-      if(!exErr && existing){
+      const respExisting = await fetch(REST_URL + '?select=id', { headers: REST_HEADERS });
+      if(respExisting.ok){
+        const existing = await respExisting.json();
         const toDelete = existing.map(r=>r.id).filter(id => !currentIds.includes(id));
         if(toDelete.length){
-          const { error: delErr } = await supa.from(TABLE).delete().in('id', toDelete);
-          if(delErr) console.error('Erro ao remover registros:', delErr);
+          const idsParam = toDelete.map(id => encodeURIComponent(id)).join(',');
+          const delResp = await fetch(REST_URL + '?id=in.(' + idsParam + ')', { method: 'DELETE', headers: REST_HEADERS });
+          if(!delResp.ok) console.error('Erro ao remover registros:', delResp.status, await delResp.text());
         }
       }
     } finally {
